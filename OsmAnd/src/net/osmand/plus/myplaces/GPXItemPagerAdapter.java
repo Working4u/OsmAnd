@@ -461,7 +461,7 @@ public class GPXItemPagerAdapter extends PagerAdapter implements CustomTabProvid
 				if (!chartClicked) {
 					chartClicked = true;
 					if (selectedWpt != null) {
-						actionsListener.onPointSelected(selectedWpt.lat, selectedWpt.lon);
+						actionsListener.onPointSelected(segment, selectedWpt.lat, selectedWpt.lon);
 					}
 				}
 			}
@@ -496,7 +496,7 @@ public class GPXItemPagerAdapter extends PagerAdapter implements CustomTabProvid
 				WptPt wpt = getPoint(chart, h.getX());
 				selectedWpt = wpt;
 				if (chartClicked && wpt != null) {
-					actionsListener.onPointSelected(wpt.lat, wpt.lon);
+					actionsListener.onPointSelected(segment, wpt.lat, wpt.lon);
 				}
 			}
 
@@ -565,7 +565,7 @@ public class GPXItemPagerAdapter extends PagerAdapter implements CustomTabProvid
 						chart.highlightValue(h);
 						WptPt wpt = getPoint(chart, h.getX());
 						if (wpt != null) {
-							actionsListener.onPointSelected(wpt.lat, wpt.lon);
+							actionsListener.onPointSelected(segment, wpt.lat, wpt.lon);
 						}
 					}
 				}

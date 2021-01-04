@@ -30,6 +30,7 @@ import net.osmand.GPXUtilities.Track;
 import net.osmand.GPXUtilities.TrkSegment;
 import net.osmand.GPXUtilities.WptPt;
 import net.osmand.PlatformUtil;
+import net.osmand.data.LatLon;
 import net.osmand.data.QuadRect;
 import net.osmand.data.RotatedTileBox;
 import net.osmand.plus.GPXDatabase.GpxDataItem;
@@ -47,6 +48,7 @@ import net.osmand.plus.helpers.AndroidUiHelper;
 import net.osmand.plus.helpers.GpxUiHelper;
 import net.osmand.plus.helpers.GpxUiHelper.GPXDataSetType;
 import net.osmand.plus.helpers.GpxUiHelper.OrderedLineDataSet;
+import net.osmand.plus.mapcontextmenu.other.TrackChartPoints;
 import net.osmand.plus.mapcontextmenu.other.TrackDetailsMenu;
 import net.osmand.plus.measurementtool.GpxData;
 import net.osmand.plus.measurementtool.MeasurementEditingContext;
@@ -84,6 +86,8 @@ public class TrackMenuFragment extends ContextMenuScrollFragment implements Card
 	private BottomNavigationView bottomNav;
 	private TrackMenuType menuType = TrackMenuType.TRACK;
 	private SegmentsCard segmentsCard;
+
+	private TrackChartPoints trackChartPoints;
 
 	private int menuTitleHeight;
 
@@ -237,6 +241,24 @@ public class TrackMenuFragment extends ContextMenuScrollFragment implements Card
 	public void onDestroyView() {
 		super.onDestroyView();
 		exitTrackAppearanceMode();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		MapActivity mapActivity = getMapActivity();
+		if (mapActivity != null && trackChartPoints != null) {
+			mapActivity.getMapLayers().getGpxLayer().setTrackChartPoints(trackChartPoints);
+		}
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		MapActivity mapActivity = getMapActivity();
+		if (mapActivity != null) {
+			mapActivity.getMapLayers().getGpxLayer().setTrackChartPoints(null);
+		}
 	}
 
 	private void enterTrackAppearanceMode() {
@@ -405,8 +427,19 @@ public class TrackMenuFragment extends ContextMenuScrollFragment implements Card
 	}
 
 	@Override
-	public void onPointSelected(double lat, double lon) {
-
+	public void onPointSelected(TrkSegment segment, double lat, double lon) {
+		if (trackChartPoints == null) {
+			trackChartPoints = new TrackChartPoints();
+			trackChartPoints.setGpx(getGpx());
+		}
+		MapActivity mapActivity = getMapActivity();
+		if (mapActivity != null) {
+			int segmentColor = segment != null ? segment.getColor(0) : 0;
+			trackChartPoints.setSegmentColor(segmentColor);
+			trackChartPoints.setHighlightedPoint(new LatLon(lat, lon));
+			mapActivity.getMapLayers().getGpxLayer().setTrackChartPoints(trackChartPoints);
+			mapActivity.refreshMap();
+		}
 	}
 
 	@Override
